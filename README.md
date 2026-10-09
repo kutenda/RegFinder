@@ -1,20 +1,6 @@
-# RegFinder V3
+# RegFinder V4 Complete Build
 
-GitHub Pages-ready static prototype.
+Open `index.html` to run the finished storefront/admin prototype.
 
-## V3 additions
-- Better search + style/budget/sort filters
-- Saved/favourite registrations
-- Registration basket / shortlist
-- Multi-registration enquiry flow
-- Trust strip and storefront polish
-- Admin settings
-- JSON full-data backup + restore
-- Inventory, order and finder-lead CSV export
-- Editable service-fee tiers
-- Responsive mobile layout
-
-## Production boundary
-This version intentionally does not claim live DVLA availability, scrape DVLA, or collect live payments.
-Before launch, connect an authorised registration inventory/availability source, a server-side database/auth system,
-and a payment provider with server-side order verification.
+See `PRODUCTION_SETUP.md` for the four credential-dependent production connections.
+This package intentionally does not include or fake secret keys, live payments, or an unauthorised DVLA scraper.
