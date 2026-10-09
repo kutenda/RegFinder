@@ -1,8 +1,11 @@
 -- RegFinder hotfix: customer enquiry RPC
 -- Run this once in Supabase > SQL Editor.
--- Fixes the ambiguous `status` reference inside submit_order.
+-- Recreates submit_order with the parameter names used by the live website.
+-- DROP is required because PostgreSQL will not rename existing function input parameters with CREATE OR REPLACE.
 
-create or replace function public.submit_order(
+drop function if exists public.submit_order(text,text,text);
+
+create function public.submit_order(
   p_registration_text text,
   p_customer_name text,
   p_customer_email text
