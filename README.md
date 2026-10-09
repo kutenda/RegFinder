@@ -1,17 +1,20 @@
-# RegFinder V2
+# RegFinder V3
 
-GitHub Pages-ready prototype.
+GitHub Pages-ready static prototype.
 
-V2 adds:
-- Admin dashboard
-- Editable fee tiers
-- Manual inventory manager
-- Order enquiry / reservation workflow
-- Finder lead management
-- CSV exports
-- Browser persistence via localStorage
-- Responsive storefront
+## V3 additions
+- Better search + style/budget/sort filters
+- Saved/favourite registrations
+- Registration basket / shortlist
+- Multi-registration enquiry flow
+- Trust strip and storefront polish
+- Admin settings
+- JSON full-data backup + restore
+- Inventory, order and finder-lead CSV export
+- Editable service-fee tiers
+- Responsive mobile layout
 
-Important: live DVLA scraping and payment collection are intentionally not enabled. Connect an authorised inventory source and server-side verification/fulfilment before taking live orders.
-
-For a production deployment, replace localStorage with a database/auth backend and protect `/admin` with authentication.
+## Production boundary
+This version intentionally does not claim live DVLA availability, scrape DVLA, or collect live payments.
+Before launch, connect an authorised registration inventory/availability source, a server-side database/auth system,
+and a payment provider with server-side order verification.

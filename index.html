@@ -43,10 +43,24 @@ footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);f
 .tierrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:8px 0}.tierrow input{padding:10px;border:1px solid #d7dce2;border-radius:8px}
 @media(max-width:800px){.statgrid{grid-template-columns:1fr 1fr}.adminform{grid-template-columns:1fr 1fr}}
 </style>
+
+<style>
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 20px}
+.filters select,.filters input{border:1px solid #d7dce2;border-radius:9px;padding:10px 12px;background:white;font:inherit}
+.heart{background:#fff;color:#111;border:1px solid var(--line);padding:8px 10px}
+.cardtop{display:flex;justify-content:flex-end;margin-bottom:8px}
+.cartbtn{position:relative}.badge{position:absolute;right:-9px;top:-9px;background:#ffd900;color:#111;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;font-size:11px;font-weight:900}
+.trustbar{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;background:#fff}.trustitems{display:flex;justify-content:center;gap:35px;flex-wrap:wrap;font-size:13px;font-weight:700}
+.empty{grid-column:1/-1;text-align:center;padding:50px;border:1px dashed #cbd5e1;border-radius:16px;color:var(--muted)}
+.cartline{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.cartline b{font-size:17px}.checkoutbox{background:#f8fafc;border-radius:14px;padding:16px;margin-top:16px}
+.settinggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.settinggrid input{padding:11px;border:1px solid #d7dce2;border-radius:8px}
+@media(max-width:700px){.trustitems{gap:14px}.settinggrid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="top">Simple all-in pricing • No hidden checkout surprises</div>
-<div class="wrap"><nav><div class="brand"><span>REG</span>FINDER</div><div class="navlinks"><a href="#results">Buy</a><a href="#finder">Find a reg</a><a href="#how">How it works</a><a href="#about">About</a><a href="#admin" onclick="openAdmin()">Admin</a></div></nav></div>
+<div class="wrap"><nav><div class="brand"><span>REG</span>FINDER</div><div class="navlinks"><a href="#results">Buy</a><a href="#finder">Find a reg</a><a href="#how">How it works</a><a href="#about">About</a><a href="#results" onclick="showFavs()">♡ Saved</a><a href="#" class="cartbtn" onclick="openCart();return false">Basket <span class="badge" id="cartCount">0</span></a><a href="#admin" onclick="openAdmin()">Admin</a></div></nav></div>
 <section class="hero"><div class="wrap">
 <div class="eyebrow">Personalised registrations, simplified</div>
 <h1>Find a reg that's actually you.</h1>
@@ -54,9 +68,14 @@ footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);f
 <div class="search"><input id="search" placeholder="TRY: SHAFT, EDEN, KU73 NDA"><button onclick="doSearch()">Search registrations</button></div>
 <div class="quick"><span class="chip" onclick="setSearch('EDEN')">EDEN</span><span class="chip" onclick="setSearch('SHAFT')">SHAFT</span><span class="chip" onclick="setSearch('K')">Initial K</span><span class="chip" onclick="setSearch('NDA')">NDA</span></div>
 </div></section>
+<div class="trustbar"><div class="wrap trustitems"><span>✓ Clear all-in pricing</span><span>✓ Small fixed service fee</span><span>✓ Age-rule guidance</span><span>✓ Availability checked before payment</span></div></div>
 <section class="section" id="results"><div class="wrap">
 <div class="sectionhead"><div><div class="eyebrow">Example inventory</div><h2 id="resultTitle">Registrations you might like</h2></div><p id="count">6 results</p></div>
-<div class="grid" id="cards"></div>
+<div class="filters">
+<select id="typeFilter" onchange="applyFilters()"><option value="">All styles</option><option>Current</option><option>Prefix</option><option>Suffix</option><option>Dateless</option></select>
+<select id="budgetFilter" onchange="applyFilters()"><option value="">Any budget</option><option value="500">Up to £500</option><option value="750">Up to £750</option><option value="1000">Up to £1,000</option><option value="2500">Up to £2,500</option></select>
+<select id="sortFilter" onchange="applyFilters()"><option value="match">Best match</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select>
+</div><div class="grid" id="cards"></div>
 </div></section>
 <section class="section why" id="how"><div class="wrap">
 <div class="sectionhead"><div><div class="eyebrow">Why RegFinder?</div><h2>Know what you're paying for.</h2></div></div>
@@ -81,7 +100,7 @@ footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);f
    <button onclick="tab('inventory',this)">Inventory</button>
    <button onclick="tab('pricing',this)">Pricing</button>
    <button onclick="tab('orders',this)">Orders</button>
-   <button onclick="tab('leads',this)">Finder leads</button>
+   <button onclick="tab('leads',this)">Finder leads</button><button onclick="tab('settings',this)">Settings</button>
   </div>
   <div class="tab active" id="tab-dashboard">
    <div class="statgrid">
@@ -103,6 +122,8 @@ footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);f
  </div>
 </div></div>
 
+
+<div class="modal" id="cartModal"><div class="panel"><button class="close" onclick="closeCart()">✕</button><div class="eyebrow">Your shortlist</div><h2 style="font-size:30px;margin-top:8px">Registration basket</h2><div id="cartLines"></div><div class="checkoutbox"><div class="row"><b>Total</b><b id="cartTotal">£0</b></div><p class="small">No payment is taken in this prototype. Each registration must be re-verified before an order is accepted.</p><button style="width:100%" onclick="basketEnquiry()">Enquire about basket</button></div></div></div>
 <div class="modal" id="modal"><div class="panel"><button class="close" onclick="closeModal()">✕</button><div id="modalBody"></div></div></div>
 <script>
 const DEFAULT_FEES=[[299,29],[499,39],[749,49],[999,59],[1499,69],[1999,89],[2999,119],[4999,149],[9999,179],[999999999,249]];
@@ -115,37 +136,60 @@ const DEFAULT_INVENTORY=[
 {reg:"E10 DEN",source:799,type:"Prefix",year:"Age rules apply",status:"Example"}];
 let fees=JSON.parse(localStorage.getItem('regfinder_fees')||'null')||DEFAULT_FEES;
 let inventory=JSON.parse(localStorage.getItem('regfinder_inventory')||'null')||DEFAULT_INVENTORY;
+let currentResults=[...inventory];
+const get=(k,d=[])=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));
+const put=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 function fee(p){return fees.find(x=>p<=x[0])?.[1]??249}
 function money(n){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function total(x){return +x.source+fee(+x.source)}
+function isFav(reg){return get('regfinder_favs').includes(reg)}
 function render(items){
- document.getElementById('count').textContent=items.length+" results";
- document.getElementById('cards').innerHTML=items.map((x,i)=>{let f=fee(+x.source),t=+x.source+f;return `<article class="card"><div class="plate">${esc(x.reg)}</div><div class="row"><div><div class="price">${money(t)}</div><div class="small">All-in example price</div></div><span class="tag">${esc(x.type)}</span></div><div class="breakdown"><div><span>Source price</span><b>${money(+x.source)}</b></div><div><span>Our service fee</span><b>${money(f)}</b></div><div><span>You pay</span><b>${money(t)}</b></div></div><button onclick="openReg(${i},'${encodeURIComponent(JSON.stringify(items))}')">View registration</button></article>`}).join('');
+ currentResults=items;
+ count.textContent=items.length+" results";
+ cards.innerHTML=items.length?items.map((x,i)=>`<article class="card"><div class="cardtop"><button class="heart" onclick="toggleFav('${esc(x.reg)}')">${isFav(x.reg)?'♥':'♡'}</button></div><div class="plate">${esc(x.reg)}</div><div class="row"><div><div class="price">${money(total(x))}</div><div class="small">All-in example price</div></div><span class="tag">${esc(x.type)}</span></div><div class="breakdown"><div><span>Source price</span><b>${money(+x.source)}</b></div><div><span>Our service fee</span><b>${money(fee(+x.source))}</b></div><div><span>You pay</span><b>${money(total(x))}</b></div></div><button onclick="openReg(${i})">View registration</button></article>`).join(''):`<div class="empty"><b>No matches yet.</b><br>Try another name/initial or send us a finder request below.</div>`;
+ updateCartCount();
 }
-function doSearch(){let q=document.getElementById('search').value.trim().toUpperCase();let compact=q.replace(/\s/g,'');let hits=inventory.filter(x=>x.reg.replace(/\s/g,'').includes(compact)||(!compact?true:[...compact].filter(c=>x.reg.includes(c)).length>=Math.min(3,compact.length)));document.getElementById('resultTitle').textContent=q?`Matches for “${q}”`:"Registrations you might like";render(hits.length?hits:inventory)}
-function setSearch(v){search.value=v;doSearch();results.scrollIntoView({behavior:'smooth'})}
-function openReg(i,encoded){let arr=JSON.parse(decodeURIComponent(encoded)),x=arr[i],f=fee(+x.source),t=+x.source+f;modalBody.innerHTML=`<div class="eyebrow">${esc(x.type)} registration</div><div class="plate">${esc(x.reg)}</div><div class="total">${money(t)} total</div><p class="small">Availability and source price must be verified before acceptance.</p><div class="breakdown"><div><span>Registration/source price</span><b>${money(+x.source)}</b></div><div><span>RegFinder sourcing & processing</span><b>${money(f)}</b></div><div><span>Total</span><b>${money(t)}</b></div></div><p class="notice"><b>Vehicle age:</b> ${esc(x.year)}. A personalised registration cannot be used to make a vehicle appear newer than it is.</p><h3>Reserve / enquire</h3><div class="form"><input id="oName" placeholder="Your name"><input id="oEmail" type="email" placeholder="Email"><button onclick='reserve(${JSON.stringify(x)})'>Continue</button></div>`;modal.classList.add('on')}
+function doSearch(){applyFilters()}
+function applyFilters(){
+ let q=search.value.trim().toUpperCase().replace(/\s/g,''),items=[...inventory];
+ if(q)items=items.filter(x=>x.reg.replace(/\s/g,'').includes(q)||[...q].filter(c=>x.reg.includes(c)).length>=Math.min(3,q.length));
+ if(typeFilter.value)items=items.filter(x=>x.type===typeFilter.value);
+ if(budgetFilter.value)items=items.filter(x=>total(x)<=+budgetFilter.value);
+ if(sortFilter.value==='low')items.sort((a,b)=>total(a)-total(b));
+ if(sortFilter.value==='high')items.sort((a,b)=>total(b)-total(a));
+ resultTitle.textContent=q?`Matches for “${search.value.trim().toUpperCase()}”`:"Registrations you might like";render(items)
+}
+function setSearch(v){search.value=v;applyFilters();results.scrollIntoView({behavior:'smooth'})}
+function toggleFav(reg){let a=get('regfinder_favs');a=a.includes(reg)?a.filter(x=>x!==reg):[...a,reg];put('regfinder_favs',a);render(currentResults)}
+function showFavs(){let a=get('regfinder_favs');resultTitle.textContent="Your saved registrations";render(inventory.filter(x=>a.includes(x.reg)))}
+function openReg(i){let x=currentResults[i];modalBody.innerHTML=`<div class="eyebrow">${esc(x.type)} registration</div><div class="plate">${esc(x.reg)}</div><div class="total">${money(total(x))} total</div><p class="small">Availability and source price must be verified before acceptance.</p><div class="breakdown"><div><span>Registration/source price</span><b>${money(+x.source)}</b></div><div><span>RegFinder sourcing & processing</span><b>${money(fee(+x.source))}</b></div><div><span>Total</span><b>${money(total(x))}</b></div></div><p class="notice"><b>Vehicle age:</b> ${esc(x.year)}. A personalised registration cannot be used to make a vehicle appear newer than it is.</p><div style="display:flex;gap:8px"><button style="flex:1" onclick='addCart(${JSON.stringify(x)})'>Add to basket</button><button class="ghost" onclick="toggleFav('${esc(x.reg)}')">♡ Save</button></div><h3>Or enquire now</h3><div class="form"><input id="oName" placeholder="Your name"><input id="oEmail" type="email" placeholder="Email"><button onclick='reserve(${JSON.stringify(x)})'>Send enquiry</button></div>`;modal.classList.add('on')}
 function closeModal(){modal.classList.remove('on')}
-function reserve(x){if(!oName.value||!oEmail.value)return alert('Enter your name and email.');let orders=JSON.parse(localStorage.getItem('regfinder_orders')||'[]');let f=fee(+x.source);orders.unshift({date:new Date().toISOString(),reg:x.reg,source:+x.source,fee:f,total:+x.source+f,name:oName.value,email:oEmail.value,status:'Awaiting verification'});localStorage.setItem('regfinder_orders',JSON.stringify(orders));closeModal();alert('Order enquiry saved. The registration must be verified before payment is taken.');refreshAdmin()}
-function lead(e){e.preventDefault();let leads=JSON.parse(localStorage.getItem('regfinder_leads')||'[]');leads.unshift({wanted:wanted.value,budget:budget.value,email:email.value,year:year.value,created:new Date().toISOString()});localStorage.setItem('regfinder_leads',JSON.stringify(leads));alert("Saved — your finder request has been recorded.");e.target.reset();refreshAdmin()}
-function openAdmin(){adminModal.classList.add('on');refreshAdmin();renderTiers()}
+function addCart(x){let a=get('regfinder_cart');if(!a.some(y=>y.reg===x.reg))a.push(x);put('regfinder_cart',a);updateCartCount();closeModal();openCart()}
+function updateCartCount(){cartCount.textContent=get('regfinder_cart').length}
+function openCart(){let a=get('regfinder_cart');cartLines.innerHTML=a.length?a.map((x,i)=>`<div class="cartline"><div><b>${esc(x.reg)}</b><div class="small">${esc(x.type)} • ${money(+x.source)} + ${money(fee(+x.source))} service</div></div><div><b>${money(total(x))}</b><br><button class="ghost mini" onclick="removeCart(${i})">Remove</button></div></div>`).join(''):'<p class="small">Your basket is empty.</p>';cartTotal.textContent=money(a.reduce((s,x)=>s+total(x),0));cartModal.classList.add('on')}
+function closeCart(){cartModal.classList.remove('on')}
+function removeCart(i){let a=get('regfinder_cart');a.splice(i,1);put('regfinder_cart',a);updateCartCount();openCart()}
+function basketEnquiry(){let a=get('regfinder_cart');if(!a.length)return alert('Your basket is empty.');let name=prompt('Your name:');if(!name)return;let email=prompt('Your email:');if(!email)return;let orders=get('regfinder_orders');a.forEach(x=>orders.unshift({date:new Date().toISOString(),reg:x.reg,source:+x.source,fee:fee(+x.source),total:total(x),name,email,status:'Awaiting verification'}));put('regfinder_orders',orders);put('regfinder_cart',[]);updateCartCount();closeCart();alert('Enquiry saved. Availability will need to be verified before payment.')}
+function reserve(x){if(!oName.value||!oEmail.value)return alert('Enter your name and email.');let orders=get('regfinder_orders');orders.unshift({date:new Date().toISOString(),reg:x.reg,source:+x.source,fee:fee(+x.source),total:total(x),name:oName.value,email:oEmail.value,status:'Awaiting verification'});put('regfinder_orders',orders);closeModal();alert('Order enquiry saved. The registration must be verified before payment is taken.');refreshAdmin()}
+function lead(e){e.preventDefault();let leads=get('regfinder_leads');leads.unshift({wanted:wanted.value,budget:budget.value,email:email.value,year:year.value,created:new Date().toISOString()});put('regfinder_leads',leads);alert("Saved — your finder request has been recorded.");e.target.reset();refreshAdmin()}
+function openAdmin(){adminModal.classList.add('on');refreshAdmin();renderTiers();loadSettings()}
 function closeAdmin(){adminModal.classList.remove('on')}
 function tab(name,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');b.classList.add('active');refreshAdmin()}
-function refreshAdmin(){
- let orders=JSON.parse(localStorage.getItem('regfinder_orders')||'[]'),leads=JSON.parse(localStorage.getItem('regfinder_leads')||'[]');
- sInv.textContent=inventory.length;sOrders.textContent=orders.length;sLeads.textContent=leads.length;sFees.textContent=money(orders.reduce((a,o)=>a+(+o.fee||0),0));
- inventoryRows.innerHTML=inventory.map((x,i)=>`<tr><td><b>${esc(x.reg)}</b></td><td>${money(+x.source)}</td><td>${money(fee(+x.source))}</td><td>${money(+x.source+fee(+x.source))}</td><td>${esc(x.type)}</td><td><button class="danger mini" onclick="delInv(${i})">Delete</button></td></tr>`).join('');
- orderRows.innerHTML=orders.map(o=>`<tr><td>${new Date(o.date).toLocaleDateString('en-GB')}</td><td><b>${esc(o.reg)}</b></td><td>${money(+o.total)}</td><td>${esc(o.name)}</td><td>${esc(o.email)}</td><td>${esc(o.status)}</td></tr>`).join('');
- leadRows.innerHTML=leads.map(l=>`<tr><td>${new Date(l.created).toLocaleDateString('en-GB')}</td><td><b>${esc(l.wanted)}</b></td><td>${esc(l.budget)}</td><td>${esc(l.email)}</td><td>${esc(l.year)}</td></tr>`).join('');
-}
+function refreshAdmin(){let orders=get('regfinder_orders'),leads=get('regfinder_leads');sInv.textContent=inventory.length;sOrders.textContent=orders.length;sLeads.textContent=leads.length;sFees.textContent=money(orders.reduce((a,o)=>a+(+o.fee||0),0));inventoryRows.innerHTML=inventory.map((x,i)=>`<tr><td><b>${esc(x.reg)}</b></td><td>${money(+x.source)}</td><td>${money(fee(+x.source))}</td><td>${money(total(x))}</td><td>${esc(x.type)}</td><td><button class="danger mini" onclick="delInv(${i})">Delete</button></td></tr>`).join('');orderRows.innerHTML=orders.map(o=>`<tr><td>${new Date(o.date).toLocaleDateString('en-GB')}</td><td><b>${esc(o.reg)}</b></td><td>${money(+o.total)}</td><td>${esc(o.name)}</td><td>${esc(o.email)}</td><td>${esc(o.status)}</td></tr>`).join('');leadRows.innerHTML=leads.map(l=>`<tr><td>${new Date(l.created).toLocaleDateString('en-GB')}</td><td><b>${esc(l.wanted)}</b></td><td>${esc(l.budget)}</td><td>${esc(l.email)}</td><td>${esc(l.year)}</td></tr>`).join('')}
 function addInventory(){let reg=aReg.value.trim().toUpperCase(),p=+aPrice.value;if(!reg||!p)return alert('Enter a registration and source price.');inventory.unshift({reg,source:p,type:aType.value,year:aYear.value||'Age rules apply',status:'Manual'});saveInv();aReg.value='';aPrice.value='';aYear.value=''}
 function delInv(i){if(confirm('Delete this registration?')){inventory.splice(i,1);saveInv()}}
-function saveInv(){localStorage.setItem('regfinder_inventory',JSON.stringify(inventory));render(inventory);refreshAdmin()}
+function saveInv(){put('regfinder_inventory',inventory);render(inventory);refreshAdmin()}
 function renderTiers(){tierEditor.innerHTML=fees.map((x,i)=>`<div class="tierrow"><input type="number" id="max${i}" value="${x[0]>=999999999?'':x[0]}" placeholder="Maximum price (blank = unlimited)"><input type="number" id="fee${i}" value="${x[1]}" placeholder="Service fee"><span class="small" style="padding:11px">tier ${i+1}</span></div>`).join('')}
-function saveTiers(){let n=[];fees.forEach((x,i)=>{let max=document.getElementById('max'+i).value;n.push([max?+max:999999999,+document.getElementById('fee'+i).value])});n.sort((a,b)=>a[0]-b[0]);fees=n;localStorage.setItem('regfinder_fees',JSON.stringify(fees));render(inventory);refreshAdmin();alert('Pricing saved.')}
-function resetTiers(){fees=DEFAULT_FEES.map(x=>[...x]);localStorage.setItem('regfinder_fees',JSON.stringify(fees));renderTiers();render(inventory);refreshAdmin()}
-function csv(rows,name){if(!rows.length)return alert('Nothing to export.');let keys=Object.keys(rows[0]);let out=[keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
-function exportInventory(){csv(inventory,'regfinder-inventory.csv')}function exportOrders(){csv(JSON.parse(localStorage.getItem('regfinder_orders')||'[]'),'regfinder-orders.csv')}function exportLeads(){csv(JSON.parse(localStorage.getItem('regfinder_leads')||'[]'),'regfinder-leads.csv')}
-render(inventory);
+function saveTiers(){let n=[];fees.forEach((x,i)=>{let max=document.getElementById('max'+i).value;n.push([max?+max:999999999,+document.getElementById('fee'+i).value])});n.sort((a,b)=>a[0]-b[0]);fees=n;put('regfinder_fees',fees);render(inventory);refreshAdmin();alert('Pricing saved.')}
+function resetTiers(){fees=DEFAULT_FEES.map(x=>[...x]);put('regfinder_fees',fees);renderTiers();render(inventory);refreshAdmin()}
+function csv(rows,name){if(!rows.length)return alert('Nothing to export.');let keys=Object.keys(rows[0]);let out=[keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\n');download(out,name,'text/csv')}
+function download(content,name,type){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportInventory(){csv(inventory,'regfinder-inventory.csv')}function exportOrders(){csv(get('regfinder_orders'),'regfinder-orders.csv')}function exportLeads(){csv(get('regfinder_leads'),'regfinder-leads.csv')}
+function loadSettings(){let s=get('regfinder_settings',{});setBrand.value=s.brand||'RegFinder';setEmail.value=s.email||'';setPhone.value=s.phone||'';setCheckout.value=s.checkout||''}
+function saveSettings(){put('regfinder_settings',{brand:setBrand.value,email:setEmail.value,phone:setPhone.value,checkout:setCheckout.value});alert('Settings saved.')}
+function backupData(){let data={version:3,inventory,fees,orders:get('regfinder_orders'),leads:get('regfinder_leads'),favourites:get('regfinder_favs'),settings:get('regfinder_settings',{})};download(JSON.stringify(data,null,2),'regfinder-backup.json','application/json')}
+function restoreData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(d.inventory){inventory=d.inventory;put('regfinder_inventory',inventory)}if(d.fees){fees=d.fees;put('regfinder_fees',fees)}if(d.orders)put('regfinder_orders',d.orders);if(d.leads)put('regfinder_leads',d.leads);if(d.favourites)put('regfinder_favs',d.favourites);if(d.settings)put('regfinder_settings',d.settings);render(inventory);refreshAdmin();renderTiers();loadSettings();alert('Backup restored.')}catch(err){alert('Invalid backup file.')}};r.readAsText(f)}
+render(inventory);updateCartCount();
 </script>
 </body></html>
