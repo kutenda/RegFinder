@@ -1,217 +1,24 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RegFinder — Personalised Registration Search</title>
-<meta name="theme-color" content="#111827">
-<meta name="description" content="Find personalised registrations with clear all-in pricing and a modest sourcing fee.">
-<link rel="manifest" href="manifest.webmanifest">
-<style>
-:root{--ink:#111827;--muted:#64748b;--line:#e5e7eb;--soft:#f7f8fa;--yellow:#ffd900;--accent:#111827;--green:#087a55}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:white}
-.wrap{max-width:1160px;margin:auto;padding:0 22px}.top{font-size:12px;text-align:center;background:#111;color:#fff;padding:9px}
-nav{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
-.brand{font-weight:900;font-size:22px;letter-spacing:-1px}.brand span{background:var(--yellow);padding:6px 8px;border-radius:5px}
-.navlinks{display:flex;gap:26px;font-size:14px}.navlinks a{color:inherit;text-decoration:none}
-.hero{padding:82px 0 54px;background:linear-gradient(180deg,#fbfbfc,#fff);text-align:center}
-.eyebrow{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}
-h1{font-size:clamp(42px,7vw,76px);line-height:.98;letter-spacing:-.055em;margin:15px auto 18px;max-width:850px}
-.hero p{font-size:18px;color:var(--muted);max-width:650px;margin:0 auto 30px}
-.search{max-width:760px;margin:auto;display:flex;background:#fff;padding:8px;border:1px solid #d7dce2;border-radius:14px;box-shadow:0 12px 35px #0f172a12}
-.search input{flex:1;border:0;outline:0;font-size:18px;padding:15px 16px;text-transform:uppercase;min-width:0}
-button,.btn{border:0;background:#111827;color:white;border-radius:9px;padding:14px 22px;font-weight:800;cursor:pointer}
-.quick{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:18px}.chip{border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-size:13px;background:white;cursor:pointer}
-.section{padding:58px 0}.sectionhead{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}.sectionhead h2{font-size:30px;letter-spacing:-.03em;margin:0}.sectionhead p{color:var(--muted);margin:0}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{border:1px solid var(--line);border-radius:16px;padding:20px;background:#fff}
-.plate{background:#ffd900;border:3px solid #111;border-radius:7px;box-shadow:inset 0 0 0 2px #f5c800;font-weight:900;font-family:Arial,sans-serif;font-size:31px;letter-spacing:2px;text-align:center;padding:12px 10px;margin-bottom:17px}
-.row{display:flex;justify-content:space-between;gap:15px;align-items:center}.price{font-size:25px;font-weight:900}.small{font-size:12px;color:var(--muted)}.tag{font-size:11px;background:#e8f7f1;color:#087a55;padding:5px 8px;border-radius:999px;font-weight:800}
-.breakdown{border-top:1px solid var(--line);margin-top:14px;padding-top:13px;font-size:13px}.breakdown div{display:flex;justify-content:space-between;margin:6px 0}
-.card button{width:100%;margin-top:14px}.why{background:#f7f8fa}.whygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.whybox{background:white;border:1px solid var(--line);border-radius:16px;padding:25px}.whybox b{font-size:17px}.whybox p{color:var(--muted);font-size:14px;line-height:1.55}
-.finder{border:1px solid var(--line);border-radius:22px;padding:34px;display:grid;grid-template-columns:1.1fr .9fr;gap:35px;align-items:center}.finder h2{font-size:34px;letter-spacing:-.04em;margin:0 0 10px}.finder p{color:var(--muted)}
-.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form input,.form select{border:1px solid #d7dce2;border-radius:9px;padding:13px;font:inherit}.form button{grid-column:1/-1}
-footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);font-size:12px;line-height:1.6}
-.modal{position:fixed;inset:0;background:#0f172ab8;display:none;align-items:center;justify-content:center;padding:20px}.modal.on{display:flex}.panel{background:#fff;border-radius:18px;max-width:620px;width:100%;padding:28px;max-height:90vh;overflow:auto}.close{float:right;background:#f1f5f9;color:#111;padding:8px 11px}.panel .plate{font-size:38px}.total{font-size:38px;font-weight:900}.notice{background:#fff8d8;border-radius:10px;padding:12px;font-size:12px;line-height:1.5}
-.admin{margin-top:16px;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer}
-@media(max-width:800px){.navlinks{display:none}.hero{padding-top:55px}.search{flex-direction:column}.grid,.whygrid{grid-template-columns:1fr}.finder{grid-template-columns:1fr}.sectionhead{align-items:start;flex-direction:column;gap:6px}}
-</style>
-
-<style>
-.adminmodal{position:fixed;inset:0;background:#0f172ad9;display:none;z-index:20;overflow:auto;padding:24px}.adminmodal.on{display:block}
-.adminshell{max-width:1100px;margin:auto;background:#fff;border-radius:20px;overflow:hidden}.adminhead{padding:22px 25px;background:#111827;color:#fff;display:flex;justify-content:space-between;align-items:center}
-.adminbody{padding:24px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tabs button{background:#eef2f7;color:#111}.tabs button.active{background:#111827;color:#fff}
-.tab{display:none}.tab.active{display:block}.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{border:1px solid var(--line);border-radius:14px;padding:17px}.stat strong{display:block;font-size:27px}
-.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:14px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);white-space:nowrap}th{background:#f8fafc}
-.adminform{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.adminform input,.adminform select{padding:11px;border:1px solid #d7dce2;border-radius:8px}.adminform button{padding:11px}
-.mini{padding:7px 10px;font-size:12px}.danger{background:#991b1b}.success{background:#087a55}.ghost{background:#eef2f7;color:#111}
-.tierrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:8px 0}.tierrow input{padding:10px;border:1px solid #d7dce2;border-radius:8px}
-@media(max-width:800px){.statgrid{grid-template-columns:1fr 1fr}.adminform{grid-template-columns:1fr 1fr}}
-</style>
-
-<style>
-.filters{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 20px}
-.filters select,.filters input{border:1px solid #d7dce2;border-radius:9px;padding:10px 12px;background:white;font:inherit}
-.heart{background:#fff;color:#111;border:1px solid var(--line);padding:8px 10px}
-.cardtop{display:flex;justify-content:flex-end;margin-bottom:8px}
-.cartbtn{position:relative}.badge{position:absolute;right:-9px;top:-9px;background:#ffd900;color:#111;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;font-size:11px;font-weight:900}
-.trustbar{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0;background:#fff}.trustitems{display:flex;justify-content:center;gap:35px;flex-wrap:wrap;font-size:13px;font-weight:700}
-.empty{grid-column:1/-1;text-align:center;padding:50px;border:1px dashed #cbd5e1;border-radius:16px;color:var(--muted)}
-.cartline{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
-.cartline b{font-size:17px}.checkoutbox{background:#f8fafc;border-radius:14px;padding:16px;margin-top:16px}
-.settinggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.settinggrid input{padding:11px;border:1px solid #d7dce2;border-radius:8px}
-@media(max-width:700px){.trustitems{gap:14px}.settinggrid{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<div class="top">Simple all-in pricing • No hidden checkout surprises</div>
-<div class="wrap"><nav><div class="brand"><span>REG</span>FINDER</div><div class="navlinks"><a href="#results">Buy</a><a href="#finder">Find a reg</a><a href="#how">How it works</a><a href="#about">About</a><a href="#results" onclick="showFavs()">♡ Saved</a><a href="#" class="cartbtn" onclick="openCart();return false">Basket <span class="badge" id="cartCount">0</span></a><a href="#admin" onclick="openAdmin()">Admin</a></div></nav></div>
-<section class="hero"><div class="wrap">
-<div class="eyebrow">Personalised registrations, simplified</div>
-<h1>Find a reg that's actually you.</h1>
-<p>Search by name, initials, word or registration. Clear all-in pricing with a modest sourcing and processing fee.</p>
-<div class="search"><input id="search" placeholder="TRY: SHAFT, EDEN, KU73 NDA"><button onclick="doSearch()">Search registrations</button></div>
-<div class="quick"><span class="chip" onclick="setSearch('EDEN')">EDEN</span><span class="chip" onclick="setSearch('SHAFT')">SHAFT</span><span class="chip" onclick="setSearch('K')">Initial K</span><span class="chip" onclick="setSearch('NDA')">NDA</span></div>
-</div></section>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RegFinder — Personalised Registration Search</title><meta name="theme-color" content="#111827"><meta name="description" content="Find personalised registrations with clear all-in pricing and a modest sourcing fee."><link rel="manifest" href="manifest.webmanifest"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>:root{--ink:#111827;--muted:#64748b;--line:#e5e7eb;--soft:#f7f8fa;--yellow:#ffd900;--green:#087a55}*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff}.wrap{max-width:1160px;margin:auto;padding:0 22px}.top{font-size:12px;text-align:center;background:#111;color:#fff;padding:9px}nav{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{font-weight:900;font-size:22px;letter-spacing:-1px}.brand span{background:var(--yellow);padding:6px 8px;border-radius:5px}.navlinks{display:flex;gap:24px;font-size:14px}.navlinks a{color:inherit;text-decoration:none}.hero{padding:82px 0 54px;background:linear-gradient(180deg,#fbfbfc,#fff);text-align:center}.eyebrow{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--green)}h1{font-size:clamp(42px,7vw,76px);line-height:.98;letter-spacing:-.055em;margin:15px auto 18px;max-width:850px}.hero p{font-size:18px;color:var(--muted);max-width:650px;margin:0 auto 30px}.search{max-width:760px;margin:auto;display:flex;background:#fff;padding:8px;border:1px solid #d7dce2;border-radius:14px;box-shadow:0 12px 35px #0f172a12}.search input{flex:1;border:0;outline:0;font-size:18px;padding:15px 16px;text-transform:uppercase;min-width:0}button{border:0;background:#111827;color:white;border-radius:9px;padding:14px 22px;font-weight:800;cursor:pointer}.quick,.filters{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:18px}.chip{border:1px solid var(--line);padding:8px 12px;border-radius:999px;font-size:13px;background:white;cursor:pointer}.trustbar{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:15px 0}.trustitems{display:flex;justify-content:center;gap:35px;flex-wrap:wrap;font-size:13px;font-weight:700}.section{padding:58px 0}.sectionhead{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}.sectionhead h2{font-size:30px;letter-spacing:-.03em;margin:0}.sectionhead p,.small{color:var(--muted)}.filters{justify-content:flex-start;margin:0 0 20px}.filters select{border:1px solid #d7dce2;border-radius:9px;padding:10px 12px;background:white}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{border:1px solid var(--line);border-radius:16px;padding:20px;background:#fff}.plate{background:#ffd900;border:3px solid #111;border-radius:7px;font-weight:900;font-family:Arial,sans-serif;font-size:31px;letter-spacing:2px;text-align:center;padding:12px 10px;margin-bottom:17px}.row{display:flex;justify-content:space-between;gap:15px;align-items:center}.price{font-size:25px;font-weight:900}.small{font-size:12px}.tag{font-size:11px;background:#e8f7f1;color:#087a55;padding:5px 8px;border-radius:999px;font-weight:800}.breakdown{border-top:1px solid var(--line);margin-top:14px;padding-top:13px;font-size:13px}.breakdown div{display:flex;justify-content:space-between;margin:6px 0}.card button{width:100%;margin-top:14px}.why{background:#f7f8fa}.whygrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.whybox{background:white;border:1px solid var(--line);border-radius:16px;padding:25px}.whybox p{color:var(--muted);font-size:14px;line-height:1.55}.finder{border:1px solid var(--line);border-radius:22px;padding:34px;display:grid;grid-template-columns:1.1fr .9fr;gap:35px;align-items:center}.finder h2{font-size:34px;margin:0 0 10px}.finder p{color:var(--muted)}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form input,.form select{border:1px solid #d7dce2;border-radius:9px;padding:13px;font:inherit}.form button{grid-column:1/-1}.notice{background:#fff8d8;border-radius:10px;padding:12px;font-size:12px;line-height:1.5}.empty{text-align:center;padding:50px;border:1px dashed #cbd5e1;border-radius:16px;color:var(--muted);grid-column:1/-1}footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);font-size:12px;line-height:1.6}.modal{position:fixed;inset:0;background:#0f172ab8;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.on{display:flex}.panel{background:#fff;border-radius:18px;max-width:620px;width:100%;padding:28px;max-height:90vh;overflow:auto}.close{float:right;background:#f1f5f9;color:#111;padding:8px 11px}.total{font-size:38px;font-weight:900}@media(max-width:800px){.navlinks{display:none}.hero{padding-top:55px}.search{flex-direction:column}.grid,.whygrid,.finder{grid-template-columns:1fr}.sectionhead{align-items:start;flex-direction:column;gap:6px}}</style></head><body>
+<div class="top">Simple all-in pricing • No hidden checkout surprises</div><div class="wrap"><nav><div class="brand"><span>REG</span>FINDER</div><div class="navlinks"><a href="#results">Buy</a><a href="#finder">Find a reg</a><a href="#how">How it works</a><a href="#about">About</a></div></nav></div>
+<section class="hero"><div class="wrap"><div class="eyebrow">Personalised registrations, simplified</div><h1>Find a reg that's actually you.</h1><p>Search by name, initials, word or registration. Clear all-in pricing with a modest sourcing and processing fee.</p><div class="search"><input id="search" placeholder="TRY: SHAFT, EDEN, KU73 NDA"><button onclick="applyFilters()">Search registrations</button></div><div class="quick"><span class="chip" onclick="setSearch('EDEN')">EDEN</span><span class="chip" onclick="setSearch('SHAFT')">SHAFT</span><span class="chip" onclick="setSearch('K')">Initial K</span><span class="chip" onclick="setSearch('NDA')">NDA</span></div></div></section>
 <div class="trustbar"><div class="wrap trustitems"><span>✓ Clear all-in pricing</span><span>✓ Small fixed service fee</span><span>✓ Age-rule guidance</span><span>✓ Availability checked before payment</span></div></div>
-<section class="section" id="results"><div class="wrap">
-<div class="sectionhead"><div><div class="eyebrow">Example inventory</div><h2 id="resultTitle">Registrations you might like</h2></div><p id="count">6 results</p></div>
-<div class="filters">
-<select id="typeFilter" onchange="applyFilters()"><option value="">All styles</option><option>Current</option><option>Prefix</option><option>Suffix</option><option>Dateless</option></select>
-<select id="budgetFilter" onchange="applyFilters()"><option value="">Any budget</option><option value="500">Up to £500</option><option value="750">Up to £750</option><option value="1000">Up to £1,000</option><option value="2500">Up to £2,500</option></select>
-<select id="sortFilter" onchange="applyFilters()"><option value="match">Best match</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select>
-</div><div class="grid" id="cards"></div>
-</div></section>
-<section class="section why" id="how"><div class="wrap">
-<div class="sectionhead"><div><div class="eyebrow">Why RegFinder?</div><h2>Know what you're paying for.</h2></div></div>
-<div class="whygrid">
-<div class="whybox"><b>Clear all-in price</b><p>We show the registration source price and our service fee separately, then give you one total.</p></div>
-<div class="whybox"><b>Small service fee</b><p>Our fee is tiered rather than applying a large percentage markup to every registration.</p></div>
-<div class="whybox"><b>Managed assistance</b><p>We help with sourcing and the purchase process instead of simply presenting a registration and disappearing.</p></div>
-</div></div></section>
-<section class="section" id="finder"><div class="wrap"><div class="finder">
-<div><div class="eyebrow">Can't find it?</div><h2>Tell us what the perfect reg looks like.</h2><p>Give us the name, word or initials and your budget. This V1 stores enquiries in your browser ready for a future backend/email connection.</p></div>
-<form class="form" onsubmit="lead(event)"><input required id="wanted" placeholder="Name / word / initials"><select id="budget"><option>Under £500</option><option>£500–£1,000</option><option>£1,000–£2,500</option><option>£2,500+</option></select><input required type="email" id="email" placeholder="Email address"><input id="year" placeholder="Vehicle year (optional)"><button>Find my reg</button></form>
-</div></div></section>
-<footer id="about"><div class="wrap">
-<div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px;margin-bottom:24px">
-<div><b style="font-size:18px">REGFINDER</b><p>Independent personalised-registration sourcing service with simple, transparent pricing.</p></div>
-<div><b>Customer</b><p><a href="#finder">Find my reg</a><br><a href="#" onclick="openHelp();return false">How it works</a><br><a href="#" onclick="openOrders();return false">Track enquiry</a></p></div>
-<div><b>Important</b><p><a href="#" onclick="openLegal('terms');return false">Terms</a><br><a href="#" onclick="openLegal('privacy');return false">Privacy</a><br><a href="#" onclick="openLegal('refunds');return false">Cancellations</a></p></div>
-</div>
-<div style="border-top:1px solid var(--line);padding-top:18px">Independent service. Not affiliated with or endorsed by DVLA. Availability and source price are verified before an order is accepted. A registration cannot be used to make a vehicle appear newer than it is.</div>
-</div></footer>
-
-
-<div class="adminmodal" id="adminModal">
-<div class="adminshell">
- <div class="adminhead"><div><b style="font-size:20px">REGFINDER ADMIN</b><div style="font-size:12px;opacity:.7">V2 prototype control centre</div></div><button class="ghost" onclick="closeAdmin()">Close</button></div>
- <div class="adminbody">
-  <div class="tabs">
-   <button class="active" onclick="tab('dashboard',this)">Dashboard</button>
-   <button onclick="tab('inventory',this)">Inventory</button>
-   <button onclick="tab('pricing',this)">Pricing</button>
-   <button onclick="tab('orders',this)">Orders</button>
-   <button onclick="tab('leads',this)">Finder leads</button><button onclick="tab('settings',this)">Settings</button>
-  </div>
-  <div class="tab active" id="tab-dashboard">
-   <div class="statgrid">
-    <div class="stat"><span class="small">Registrations</span><strong id="sInv">0</strong></div>
-    <div class="stat"><span class="small">Orders</span><strong id="sOrders">0</strong></div>
-    <div class="stat"><span class="small">Finder leads</span><strong id="sLeads">0</strong></div>
-    <div class="stat"><span class="small">Potential fees</span><strong id="sFees">£0</strong></div>
-   </div>
-   <p class="notice" style="margin-top:18px"><b>Prototype safety:</b> orders are reservation/enquiry records only. No payment is collected and no DVLA purchase is automated until an authorised inventory/fulfilment route is connected.</p>
-  </div>
-  <div class="tab" id="tab-inventory">
-   <h3>Add registration</h3>
-   <div class="adminform"><input id="aReg" placeholder="REG e.g. AB12 CDE"><input id="aPrice" type="number" placeholder="Source price"><select id="aType"><option>Current</option><option>Prefix</option><option>Suffix</option><option>Dateless</option></select><input id="aYear" placeholder="Age / date rule"><button onclick="addInventory()">Add registration</button><button class="ghost" onclick="exportInventory()">Export CSV</button></div>
-   <div class="tablewrap"><table><thead><tr><th>Reg</th><th>Source</th><th>Fee</th><th>Total</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody id="inventoryRows"></tbody></table></div>
-  </div>
-  <div class="tab" id="tab-pricing"><h3>Editable finder/service fee tiers</h3><p class="small">Change these and storefront totals update immediately.</p><div id="tierEditor"></div><button onclick="saveTiers()">Save pricing</button> <button class="ghost" onclick="resetTiers()">Reset defaults</button></div>
-  <div class="tab" id="tab-orders"><div class="row"><h3>Order enquiries</h3><button class="ghost mini" onclick="exportOrders()">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Reg</th><th>Total</th><th>Name</th><th>Email</th><th>Status</th></tr></thead><tbody id="orderRows"></tbody></table></div></div>
-  <div class="tab" id="tab-leads"><div class="row"><h3>Finder leads</h3><button class="ghost mini" onclick="exportLeads()">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Wanted</th><th>Budget</th><th>Email</th><th>Vehicle</th></tr></thead><tbody id="leadRows"></tbody></table></div></div>
- </div>
-</div></div>
-
-
-
-<div class="modal" id="infoModal"><div class="panel"><button class="close" onclick="infoModal.classList.remove('on')">✕</button><div id="infoBody"></div></div></div>
-<div class="modal" id="cartModal"><div class="panel"><button class="close" onclick="closeCart()">✕</button><div class="eyebrow">Your shortlist</div><h2 style="font-size:30px;margin-top:8px">Registration basket</h2><div id="cartLines"></div><div class="checkoutbox"><div class="row"><b>Total</b><b id="cartTotal">£0</b></div><p class="small">No payment is taken in this prototype. Each registration must be re-verified before an order is accepted.</p><button style="width:100%" onclick="basketEnquiry()">Enquire about basket</button></div></div></div>
-<div class="modal" id="modal"><div class="panel"><button class="close" onclick="closeModal()">✕</button><div id="modalBody"></div></div></div>
+<section class="section" id="results"><div class="wrap"><div class="sectionhead"><div><div class="eyebrow" id="inventoryLabel">Example inventory</div><h2 id="resultTitle">Registrations you might like</h2></div><p id="count"></p></div><div class="filters"><select id="typeFilter" onchange="applyFilters()"><option value="">All styles</option><option>Current</option><option>Prefix</option><option>Suffix</option><option>Dateless</option></select><select id="budgetFilter" onchange="applyFilters()"><option value="">Any budget</option><option value="500">Up to £500</option><option value="750">Up to £750</option><option value="1000">Up to £1,000</option><option value="2500">Up to £2,500</option></select><select id="sortFilter" onchange="applyFilters()"><option value="match">Best match</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></div><div class="grid" id="cards"></div></div></section>
+<section class="section why" id="how"><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">Why RegFinder?</div><h2>Know what you're paying for.</h2></div></div><div class="whygrid"><div class="whybox"><b>Clear all-in price</b><p>We show the registration source price and our service fee separately, then give you one total.</p></div><div class="whybox"><b>Small service fee</b><p>Our fee is tiered rather than applying a large percentage markup to every registration.</p></div><div class="whybox"><b>Managed assistance</b><p>We help with sourcing and the purchase process instead of simply presenting a registration and disappearing.</p></div></div></div></section>
+<section class="section" id="finder"><div class="wrap"><div class="finder"><div><div class="eyebrow">Can't find it?</div><h2>Tell us what the perfect reg looks like.</h2><p>Give us the name, word or initials and your budget. Your request is sent securely to our RegFinder database.</p></div><form class="form" onsubmit="lead(event)"><input required id="wanted" placeholder="Name / word / initials"><select id="budget"><option>Under £500</option><option>£500–£1,000</option><option>£1,000–£2,500</option><option>£2,500+</option></select><input required type="email" id="email" placeholder="Email address"><input id="year" placeholder="Vehicle year (optional)"><button id="leadBtn">Find my reg</button></form></div></div></section>
+<footer id="about"><div class="wrap"><b>REGFINDER</b><p>Independent personalised-registration sourcing service with simple, transparent pricing.</p><div style="border-top:1px solid var(--line);padding-top:18px">Independent service. Not affiliated with or endorsed by DVLA. Availability and source price are verified before an order is accepted. A registration cannot be used to make a vehicle appear newer than it is.</div></div></footer>
+<div class="modal" id="modal"><div class="panel"><button class="close" onclick="modal.classList.remove('on')">✕</button><div id="modalBody"></div></div></div>
 <script>
-const DEFAULT_FEES=[[299,29],[499,39],[749,49],[999,59],[1499,69],[1999,89],[2999,119],[4999,149],[9999,179],[999999999,249]];
-const DEFAULT_INVENTORY=[
-{reg:"KU73 NDA",source:399,type:"Current",year:"1 Sep 2023",status:"Example"},
-{reg:"ED24 NGM",source:399,type:"Current",year:"1 Mar 2024",status:"Example"},
-{reg:"S14 AFT",source:599,type:"Prefix",year:"Age rules apply",status:"Example"},
-{reg:"SH24 AFT",source:499,type:"Current",year:"1 Mar 2024",status:"Example"},
-{reg:"K20 NDA",source:599,type:"Prefix",year:"Age rules apply",status:"Example"},
-{reg:"E10 DEN",source:799,type:"Prefix",year:"Age rules apply",status:"Example"}];
-let fees=JSON.parse(localStorage.getItem('regfinder_fees')||'null')||DEFAULT_FEES;
-let inventory=JSON.parse(localStorage.getItem('regfinder_inventory')||'null')||DEFAULT_INVENTORY;
-let currentResults=[...inventory];
-const get=(k,d=[])=>JSON.parse(localStorage.getItem(k)||JSON.stringify(d));
-const put=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-function fee(p){return fees.find(x=>p<=x[0])?.[1]??249}
-function money(n){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function total(x){return +x.source+fee(+x.source)}
-function isFav(reg){return get('regfinder_favs').includes(reg)}
-function render(items){
- currentResults=items;
- count.textContent=items.length+" results";
- cards.innerHTML=items.length?items.map((x,i)=>`<article class="card"><div class="cardtop"><button class="heart" onclick="toggleFav('${esc(x.reg)}')">${isFav(x.reg)?'♥':'♡'}</button></div><div class="plate">${esc(x.reg)}</div><div class="row"><div><div class="price">${money(total(x))}</div><div class="small">All-in example price</div></div><span class="tag">${esc(x.type)}</span></div><div class="breakdown"><div><span>Source price</span><b>${money(+x.source)}</b></div><div><span>Our service fee</span><b>${money(fee(+x.source))}</b></div><div><span>You pay</span><b>${money(total(x))}</b></div></div><button onclick="openReg(${i})">View registration</button></article>`).join(''):`<div class="empty"><b>No matches yet.</b><br>Try another name/initial or send us a finder request below.</div>`;
- updateCartCount();
-}
-function doSearch(){applyFilters()}
-function applyFilters(){
- let q=search.value.trim().toUpperCase().replace(/\s/g,''),items=[...inventory];
- if(q)items=items.filter(x=>x.reg.replace(/\s/g,'').includes(q)||[...q].filter(c=>x.reg.includes(c)).length>=Math.min(3,q.length));
- if(typeFilter.value)items=items.filter(x=>x.type===typeFilter.value);
- if(budgetFilter.value)items=items.filter(x=>total(x)<=+budgetFilter.value);
- if(sortFilter.value==='low')items.sort((a,b)=>total(a)-total(b));
- if(sortFilter.value==='high')items.sort((a,b)=>total(b)-total(a));
- resultTitle.textContent=q?`Matches for “${search.value.trim().toUpperCase()}”`:"Registrations you might like";render(items)
-}
-function setSearch(v){search.value=v;applyFilters();results.scrollIntoView({behavior:'smooth'})}
-function toggleFav(reg){let a=get('regfinder_favs');a=a.includes(reg)?a.filter(x=>x!==reg):[...a,reg];put('regfinder_favs',a);render(currentResults)}
-function showFavs(){let a=get('regfinder_favs');resultTitle.textContent="Your saved registrations";render(inventory.filter(x=>a.includes(x.reg)))}
-function openReg(i){let x=currentResults[i];modalBody.innerHTML=`<div class="eyebrow">${esc(x.type)} registration</div><div class="plate">${esc(x.reg)}</div><div class="total">${money(total(x))} total</div><p class="small">Availability and source price must be verified before acceptance.</p><div class="breakdown"><div><span>Registration/source price</span><b>${money(+x.source)}</b></div><div><span>RegFinder sourcing & processing</span><b>${money(fee(+x.source))}</b></div><div><span>Total</span><b>${money(total(x))}</b></div></div><p class="notice"><b>Vehicle age:</b> ${esc(x.year)}. A personalised registration cannot be used to make a vehicle appear newer than it is.</p><div style="display:flex;gap:8px"><button style="flex:1" onclick='addCart(${JSON.stringify(x)})'>Add to basket</button><button class="ghost" onclick="toggleFav('${esc(x.reg)}')">♡ Save</button></div><h3>Or enquire now</h3><div class="form"><input id="oName" placeholder="Your name"><input id="oEmail" type="email" placeholder="Email"><button onclick='reserve(${JSON.stringify(x)})'>Send enquiry</button></div>`;modal.classList.add('on')}
-function closeModal(){modal.classList.remove('on')}
-function addCart(x){let a=get('regfinder_cart');if(!a.some(y=>y.reg===x.reg))a.push(x);put('regfinder_cart',a);updateCartCount();closeModal();openCart()}
-function updateCartCount(){cartCount.textContent=get('regfinder_cart').length}
-function openCart(){let a=get('regfinder_cart');cartLines.innerHTML=a.length?a.map((x,i)=>`<div class="cartline"><div><b>${esc(x.reg)}</b><div class="small">${esc(x.type)} • ${money(+x.source)} + ${money(fee(+x.source))} service</div></div><div><b>${money(total(x))}</b><br><button class="ghost mini" onclick="removeCart(${i})">Remove</button></div></div>`).join(''):'<p class="small">Your basket is empty.</p>';cartTotal.textContent=money(a.reduce((s,x)=>s+total(x),0));cartModal.classList.add('on')}
-function closeCart(){cartModal.classList.remove('on')}
-function removeCart(i){let a=get('regfinder_cart');a.splice(i,1);put('regfinder_cart',a);updateCartCount();openCart()}
-function basketEnquiry(){let a=get('regfinder_cart');if(!a.length)return alert('Your basket is empty.');let name=prompt('Your name:');if(!name)return;let email=prompt('Your email:');if(!email)return;let orders=get('regfinder_orders');a.forEach(x=>orders.unshift({date:new Date().toISOString(),reg:x.reg,source:+x.source,fee:fee(+x.source),total:total(x),name,email,status:'Awaiting verification'}));put('regfinder_orders',orders);put('regfinder_cart',[]);updateCartCount();closeCart();alert('Enquiry saved. Availability will need to be verified before payment.')}
-function reserve(x){if(!oName.value||!oEmail.value)return alert('Enter your name and email.');let orders=get('regfinder_orders');orders.unshift({date:new Date().toISOString(),reg:x.reg,source:+x.source,fee:fee(+x.source),total:total(x),name:oName.value,email:oEmail.value,status:'Awaiting verification',reference:ref()});put('regfinder_orders',orders);closeModal();alert('Order enquiry saved. The registration must be verified before payment is taken.');refreshAdmin()}
-function lead(e){e.preventDefault();let leads=get('regfinder_leads');leads.unshift({wanted:wanted.value,budget:budget.value,email:email.value,year:year.value,created:new Date().toISOString()});put('regfinder_leads',leads);alert("Saved — your finder request has been recorded.");e.target.reset();refreshAdmin()}
-function openAdmin(){adminModal.classList.add('on');refreshAdmin();renderTiers();loadSettings()}
-function closeAdmin(){adminModal.classList.remove('on')}
-function tab(name,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');b.classList.add('active');refreshAdmin()}
-function refreshAdmin(){let orders=get('regfinder_orders'),leads=get('regfinder_leads');sInv.textContent=inventory.length;sOrders.textContent=orders.length;sLeads.textContent=leads.length;sFees.textContent=money(orders.reduce((a,o)=>a+(+o.fee||0),0));inventoryRows.innerHTML=inventory.map((x,i)=>`<tr><td><b>${esc(x.reg)}</b></td><td>${money(+x.source)}</td><td>${money(fee(+x.source))}</td><td>${money(total(x))}</td><td>${esc(x.type)}</td><td>${esc(x.status||'Manual')}</td><td><button class="danger mini" onclick="delInv(${i})">Delete</button></td></tr>`).join('');orderRows.innerHTML=orders.map(o=>`<tr><td>${new Date(o.date).toLocaleDateString('en-GB')}</td><td><b>${esc(o.reg)}</b></td><td>${money(+o.total)}</td><td>${esc(o.name)}</td><td>${esc(o.email)}</td><td>${esc(o.status)}</td></tr>`).join('');leadRows.innerHTML=leads.map(l=>`<tr><td>${new Date(l.created).toLocaleDateString('en-GB')}</td><td><b>${esc(l.wanted)}</b></td><td>${esc(l.budget)}</td><td>${esc(l.email)}</td><td>${esc(l.year)}</td></tr>`).join('')}
-function addInventory(){let reg=aReg.value.trim().toUpperCase(),p=+aPrice.value;if(!reg||!p)return alert('Enter a registration and source price.');inventory.unshift({reg,source:p,type:aType.value,year:aYear.value||'Age rules apply',status:'Manual'});saveInv();aReg.value='';aPrice.value='';aYear.value=''}
-function delInv(i){if(confirm('Delete this registration?')){inventory.splice(i,1);saveInv()}}
-function saveInv(){put('regfinder_inventory',inventory);render(inventory);refreshAdmin()}
-function renderTiers(){tierEditor.innerHTML=fees.map((x,i)=>`<div class="tierrow"><input type="number" id="max${i}" value="${x[0]>=999999999?'':x[0]}" placeholder="Maximum price (blank = unlimited)"><input type="number" id="fee${i}" value="${x[1]}" placeholder="Service fee"><span class="small" style="padding:11px">tier ${i+1}</span></div>`).join('')}
-function saveTiers(){let n=[];fees.forEach((x,i)=>{let max=document.getElementById('max'+i).value;n.push([max?+max:999999999,+document.getElementById('fee'+i).value])});n.sort((a,b)=>a[0]-b[0]);fees=n;put('regfinder_fees',fees);render(inventory);refreshAdmin();alert('Pricing saved.')}
-function resetTiers(){fees=DEFAULT_FEES.map(x=>[...x]);put('regfinder_fees',fees);renderTiers();render(inventory);refreshAdmin()}
-function csv(rows,name){if(!rows.length)return alert('Nothing to export.');let keys=Object.keys(rows[0]);let out=[keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\n');download(out,name,'text/csv')}
-function download(content,name,type){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-function exportInventory(){csv(inventory,'regfinder-inventory.csv')}function exportOrders(){csv(get('regfinder_orders'),'regfinder-orders.csv')}function exportLeads(){csv(get('regfinder_leads'),'regfinder-leads.csv')}
-function loadSettings(){let s=get('regfinder_settings',{});setBrand.value=s.brand||'RegFinder';setEmail.value=s.email||'';setPhone.value=s.phone||'';setCheckout.value=s.checkout||''}
-function saveSettings(){put('regfinder_settings',{brand:setBrand.value,email:setEmail.value,phone:setPhone.value,checkout:setCheckout.value});alert('Settings saved.')}
-function backupData(){let data={version:3,inventory,fees,orders:get('regfinder_orders'),leads:get('regfinder_leads'),favourites:get('regfinder_favs'),settings:get('regfinder_settings',{})};download(JSON.stringify(data,null,2),'regfinder-backup.json','application/json')}
-function restoreData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(d.inventory){inventory=d.inventory;put('regfinder_inventory',inventory)}if(d.fees){fees=d.fees;put('regfinder_fees',fees)}if(d.orders)put('regfinder_orders',d.orders);if(d.leads)put('regfinder_leads',d.leads);if(d.favourites)put('regfinder_favs',d.favourites);if(d.settings)put('regfinder_settings',d.settings);render(inventory);refreshAdmin();renderTiers();loadSettings();alert('Backup restored.')}catch(err){alert('Invalid backup file.')}};r.readAsText(f)}
-
-function ref(){return 'RF-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()}
-function openHelp(){infoBody.innerHTML=`<div class="eyebrow">How it works</div><h2>Simple from search to assignment.</h2><p><b>1. Find a registration.</b> Search or ask us to source one.</p><p><b>2. See the full price.</b> We separate the source cost from our service fee.</p><p><b>3. We verify it.</b> Before payment, the registration and current source price are checked.</p><p><b>4. Complete the purchase.</b> Once verified, the order can move to payment and fulfilment.</p><p><b>5. Assignment guidance.</b> We provide the information needed to complete the registration assignment correctly.</p>`;infoModal.classList.add('on')}
-function openLegal(which){let c={
-terms:`<div class="eyebrow">Terms</div><h2>Service terms — draft</h2><p>RegFinder is an independent sourcing and processing service. Displayed availability and prices are not guaranteed until verified. An enquiry does not reserve ownership of a registration. We will confirm the final price before requesting payment.</p><p>Customers are responsible for ensuring a registration can legally be assigned to their vehicle. Registrations must not make a vehicle appear newer than it is.</p><p>This draft must be reviewed for your final company identity, contact details, payment process and consumer-law obligations before launch.</p>`,
-privacy:`<div class="eyebrow">Privacy</div><h2>Privacy notice — draft</h2><p>We only request information needed to answer finder requests, process enquiries and provide customer service. The static demo stores information on this device. The production build should store customer information in the configured database with appropriate access controls.</p><p>Before launch, add your legal business identity, retention periods, lawful bases, processor list and contact details.</p>`,
-refunds:`<div class="eyebrow">Cancellations</div><h2>Cancellations & refunds — draft</h2><p>No payment is collected by this static build. Production cancellation/refund wording must reflect the exact service supplied, when performance begins, and applicable UK consumer rights. Do not publish this draft as final legal advice.</p>`
-};infoBody.innerHTML=c[which];infoModal.classList.add('on')}
-function openOrders(){let email=prompt('Enter the email used for your enquiry:');if(!email)return;let a=get('regfinder_orders').filter(o=>String(o.email).toLowerCase()===email.toLowerCase());infoBody.innerHTML=`<div class="eyebrow">Enquiry tracking</div><h2>Your enquiries</h2>`+(a.length?a.map(o=>`<div class="cartline"><div><b>${esc(o.reg)}</b><div class="small">${esc(o.reference||'Legacy enquiry')}</div></div><div><b>${money(+o.total)}</b><div class="small">${esc(o.status)}</div></div></div>`).join(''):`<p>No enquiries found in this browser for that email.</p>`);infoModal.classList.add('on')}
-
-render(inventory);updateCartCount();
-</script>
-</body></html>
+const SB_URL='https://udemklikocmsdvxwywog.supabase.co';const SB_KEY='sb_publishable_P24UA9_XTsiELyeXmRmDzA_Y30JQPas';const db=supabase.createClient(SB_URL,SB_KEY);
+const DEFAULT_FEES=[[299,29],[499,39],[749,49],[999,59],[1499,69],[1999,89],[2999,119],[4999,149],[9999,179],[999999999,249]];let fees=DEFAULT_FEES;
+const DEMO=[{reg:'KU73 NDA',source:399,type:'Current',year:'1 Sep 2023'},{reg:'ED24 NGM',source:399,type:'Current',year:'1 Mar 2024'},{reg:'S14 AFT',source:599,type:'Prefix',year:'Age rules apply'},{reg:'SH24 AFT',source:499,type:'Current',year:'1 Mar 2024'},{reg:'K20 NDA',source:599,type:'Prefix',year:'Age rules apply'},{reg:'E10 DEN',source:799,type:'Prefix',year:'Age rules apply'}];let inventory=DEMO,currentResults=[];
+function fee(p){return fees.find(x=>p<=x[0])?.[1]??249}function total(x){return +x.source+fee(+x.source)}function money(n){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)}function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}function ref(){return 'RF-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase()}
+async function boot(){try{let f=await db.from('fee_tiers').select('max_source_price,service_fee,sort_order').order('sort_order');if(!f.error&&f.data?.length)fees=f.data.map(x=>[x.max_source_price==null?999999999:+x.max_source_price,+x.service_fee]);let r=await db.from('registrations').select('registration,source_price,style,vehicle_age_note,status').eq('status','verified').order('source_price');if(!r.error&&r.data?.length){inventory=r.data.map(x=>({reg:x.registration,source:+x.source_price,type:x.style,year:x.vehicle_age_note||'Age rules apply'}));inventoryLabel.textContent='Verified inventory'}else{inventory=DEMO;inventoryLabel.textContent='Example inventory'}}catch(e){inventory=DEMO}applyFilters()}
+function render(items){currentResults=items;count.textContent=items.length+' results';cards.innerHTML=items.length?items.map((x,i)=>`<article class="card"><div class="plate">${esc(x.reg)}</div><div class="row"><div><div class="price">${money(total(x))}</div><div class="small">All-in price</div></div><span class="tag">${esc(x.type)}</span></div><div class="breakdown"><div><span>Source price</span><b>${money(+x.source)}</b></div><div><span>Our service fee</span><b>${money(fee(+x.source))}</b></div><div><span>You pay</span><b>${money(total(x))}</b></div></div><button onclick="openReg(${i})">View registration</button></article>`).join(''):`<div class="empty"><b>No matches yet.</b><br>Try another search or send a finder request.</div>`}
+function applyFilters(){let q=search.value.trim().toUpperCase().replace(/\s/g,''),items=[...inventory];if(q)items=items.filter(x=>x.reg.replace(/\s/g,'').includes(q)||[...q].filter(c=>x.reg.includes(c)).length>=Math.min(3,q.length));if(typeFilter.value)items=items.filter(x=>x.type===typeFilter.value);if(budgetFilter.value)items=items.filter(x=>total(x)<=+budgetFilter.value);if(sortFilter.value==='low')items.sort((a,b)=>total(a)-total(b));if(sortFilter.value==='high')items.sort((a,b)=>total(b)-total(a));resultTitle.textContent=q?`Matches for “${search.value.trim().toUpperCase()}”`:'Registrations you might like';render(items)}function setSearch(v){search.value=v;applyFilters();results.scrollIntoView({behavior:'smooth'})}
+function openReg(i){let x=currentResults[i];modalBody.innerHTML=`<div class="eyebrow">${esc(x.type)} registration</div><div class="plate">${esc(x.reg)}</div><div class="total">${money(total(x))} total</div><p class="small">Availability and source price must be verified again before acceptance.</p><div class="breakdown"><div><span>Registration/source price</span><b>${money(+x.source)}</b></div><div><span>RegFinder sourcing & processing</span><b>${money(fee(+x.source))}</b></div><div><span>Total</span><b>${money(total(x))}</b></div></div><p class="notice"><b>Vehicle age:</b> ${esc(x.year)}. A personalised registration cannot be used to make a vehicle appear newer than it is.</p><h3>Enquire about this registration</h3><div class="form"><input id="oName" placeholder="Your name"><input id="oEmail" type="email" placeholder="Email"><button id="orderBtn" onclick="reserve(${i})">Send enquiry</button></div>`;modal.classList.add('on')}
+async function reserve(i){let x=currentResults[i],name=oName.value.trim(),mail=oEmail.value.trim();if(!name||!mail)return alert('Enter your name and email.');orderBtn.disabled=true;orderBtn.textContent='Sending…';let reference=ref();let {error}=await db.from('orders').insert({reference,registration_text:x.reg,customer_name:name,customer_email:mail,source_price:+x.source,service_fee:fee(+x.source),total:total(x),status:'awaiting_verification'});orderBtn.disabled=false;orderBtn.textContent='Send enquiry';if(error){console.error(error);return alert('We could not send the enquiry. Please try again.')}modal.classList.remove('on');alert('Enquiry sent. Your reference is '+reference+'. We will verify availability before payment.')}
+async function lead(e){e.preventDefault();leadBtn.disabled=true;leadBtn.textContent='Sending…';let {error}=await db.from('finder_leads').insert({wanted:wanted.value.trim(),budget:budget.value,vehicle_year:year.value.trim()||null,email:email.value.trim(),status:'new'});leadBtn.disabled=false;leadBtn.textContent='Find my reg';if(error){console.error(error);return alert('We could not send your finder request. Please try again.')}alert('Finder request sent successfully.');e.target.reset()}
+boot();
+</script></body></html>
