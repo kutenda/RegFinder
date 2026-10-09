@@ -31,10 +31,22 @@ footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);f
 .admin{margin-top:16px;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer}
 @media(max-width:800px){.navlinks{display:none}.hero{padding-top:55px}.search{flex-direction:column}.grid,.whygrid{grid-template-columns:1fr}.finder{grid-template-columns:1fr}.sectionhead{align-items:start;flex-direction:column;gap:6px}}
 </style>
+
+<style>
+.adminmodal{position:fixed;inset:0;background:#0f172ad9;display:none;z-index:20;overflow:auto;padding:24px}.adminmodal.on{display:block}
+.adminshell{max-width:1100px;margin:auto;background:#fff;border-radius:20px;overflow:hidden}.adminhead{padding:22px 25px;background:#111827;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.adminbody{padding:24px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tabs button{background:#eef2f7;color:#111}.tabs button.active{background:#111827;color:#fff}
+.tab{display:none}.tab.active{display:block}.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{border:1px solid var(--line);border-radius:14px;padding:17px}.stat strong{display:block;font-size:27px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:14px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);white-space:nowrap}th{background:#f8fafc}
+.adminform{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.adminform input,.adminform select{padding:11px;border:1px solid #d7dce2;border-radius:8px}.adminform button{padding:11px}
+.mini{padding:7px 10px;font-size:12px}.danger{background:#991b1b}.success{background:#087a55}.ghost{background:#eef2f7;color:#111}
+.tierrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin:8px 0}.tierrow input{padding:10px;border:1px solid #d7dce2;border-radius:8px}
+@media(max-width:800px){.statgrid{grid-template-columns:1fr 1fr}.adminform{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <div class="top">Simple all-in pricing • No hidden checkout surprises</div>
-<div class="wrap"><nav><div class="brand"><span>REG</span>FINDER</div><div class="navlinks"><a href="#results">Buy</a><a href="#finder">Find a reg</a><a href="#how">How it works</a><a href="#about">About</a></div></nav></div>
+<div class="wrap"><nav><div class="brand"><span>REG</span>FINDER</div><div class="navlinks"><a href="#results">Buy</a><a href="#finder">Find a reg</a><a href="#how">How it works</a><a href="#about">About</a><a href="#admin" onclick="openAdmin()">Admin</a></div></nav></div>
 <section class="hero"><div class="wrap">
 <div class="eyebrow">Personalised registrations, simplified</div>
 <h1>Find a reg that's actually you.</h1>
@@ -59,27 +71,81 @@ footer{border-top:1px solid var(--line);padding:30px 0 45px;color:var(--muted);f
 </div></div></section>
 <footer id="about"><div class="wrap"><b>REGFINDER</b><br>Independent personalised-registration finding service. Not affiliated with or endorsed by DVLA. Registration availability and source prices must be verified before an order is accepted. This prototype uses demonstration inventory only and does not scrape DVLA.</div></footer>
 
+
+<div class="adminmodal" id="adminModal">
+<div class="adminshell">
+ <div class="adminhead"><div><b style="font-size:20px">REGFINDER ADMIN</b><div style="font-size:12px;opacity:.7">V2 prototype control centre</div></div><button class="ghost" onclick="closeAdmin()">Close</button></div>
+ <div class="adminbody">
+  <div class="tabs">
+   <button class="active" onclick="tab('dashboard',this)">Dashboard</button>
+   <button onclick="tab('inventory',this)">Inventory</button>
+   <button onclick="tab('pricing',this)">Pricing</button>
+   <button onclick="tab('orders',this)">Orders</button>
+   <button onclick="tab('leads',this)">Finder leads</button>
+  </div>
+  <div class="tab active" id="tab-dashboard">
+   <div class="statgrid">
+    <div class="stat"><span class="small">Registrations</span><strong id="sInv">0</strong></div>
+    <div class="stat"><span class="small">Orders</span><strong id="sOrders">0</strong></div>
+    <div class="stat"><span class="small">Finder leads</span><strong id="sLeads">0</strong></div>
+    <div class="stat"><span class="small">Potential fees</span><strong id="sFees">£0</strong></div>
+   </div>
+   <p class="notice" style="margin-top:18px"><b>Prototype safety:</b> orders are reservation/enquiry records only. No payment is collected and no DVLA purchase is automated until an authorised inventory/fulfilment route is connected.</p>
+  </div>
+  <div class="tab" id="tab-inventory">
+   <h3>Add registration</h3>
+   <div class="adminform"><input id="aReg" placeholder="REG e.g. AB12 CDE"><input id="aPrice" type="number" placeholder="Source price"><select id="aType"><option>Current</option><option>Prefix</option><option>Suffix</option><option>Dateless</option></select><input id="aYear" placeholder="Age / date rule"><button onclick="addInventory()">Add registration</button><button class="ghost" onclick="exportInventory()">Export CSV</button></div>
+   <div class="tablewrap"><table><thead><tr><th>Reg</th><th>Source</th><th>Fee</th><th>Total</th><th>Type</th><th></th></tr></thead><tbody id="inventoryRows"></tbody></table></div>
+  </div>
+  <div class="tab" id="tab-pricing"><h3>Editable finder/service fee tiers</h3><p class="small">Change these and storefront totals update immediately.</p><div id="tierEditor"></div><button onclick="saveTiers()">Save pricing</button> <button class="ghost" onclick="resetTiers()">Reset defaults</button></div>
+  <div class="tab" id="tab-orders"><div class="row"><h3>Order enquiries</h3><button class="ghost mini" onclick="exportOrders()">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Reg</th><th>Total</th><th>Name</th><th>Email</th><th>Status</th></tr></thead><tbody id="orderRows"></tbody></table></div></div>
+  <div class="tab" id="tab-leads"><div class="row"><h3>Finder leads</h3><button class="ghost mini" onclick="exportLeads()">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Wanted</th><th>Budget</th><th>Email</th><th>Vehicle</th></tr></thead><tbody id="leadRows"></tbody></table></div></div>
+ </div>
+</div></div>
+
 <div class="modal" id="modal"><div class="panel"><button class="close" onclick="closeModal()">✕</button><div id="modalBody"></div></div></div>
 <script>
-const fees=[ [299,29],[499,39],[749,49],[999,59],[1499,69],[1999,89],[2999,119],[4999,149],[9999,179],[Infinity,249] ];
-const inventory=[
+const DEFAULT_FEES=[[299,29],[499,39],[749,49],[999,59],[1499,69],[1999,89],[2999,119],[4999,149],[9999,179],[999999999,249]];
+const DEFAULT_INVENTORY=[
 {reg:"KU73 NDA",source:399,type:"Current",year:"1 Sep 2023",status:"Example"},
 {reg:"ED24 NGM",source:399,type:"Current",year:"1 Mar 2024",status:"Example"},
 {reg:"S14 AFT",source:599,type:"Prefix",year:"Age rules apply",status:"Example"},
 {reg:"SH24 AFT",source:499,type:"Current",year:"1 Mar 2024",status:"Example"},
 {reg:"K20 NDA",source:599,type:"Prefix",year:"Age rules apply",status:"Example"},
 {reg:"E10 DEN",source:799,type:"Prefix",year:"Age rules apply",status:"Example"}];
-function fee(p){return fees.find(x=>p<=x[0])[1]}
+let fees=JSON.parse(localStorage.getItem('regfinder_fees')||'null')||DEFAULT_FEES;
+let inventory=JSON.parse(localStorage.getItem('regfinder_inventory')||'null')||DEFAULT_INVENTORY;
+function fee(p){return fees.find(x=>p<=x[0])?.[1]??249}
 function money(n){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',maximumFractionDigits:0}).format(n)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function render(items){
  document.getElementById('count').textContent=items.length+" results";
- document.getElementById('cards').innerHTML=items.map((x,i)=>{let f=fee(x.source),t=x.source+f;return `<article class="card"><div class="plate">${x.reg}</div><div class="row"><div><div class="price">${money(t)}</div><div class="small">All-in example price</div></div><span class="tag">${x.type}</span></div><div class="breakdown"><div><span>Source price</span><b>${money(x.source)}</b></div><div><span>Our service fee</span><b>${money(f)}</b></div><div><span>You pay</span><b>${money(t)}</b></div></div><button onclick='openReg(${JSON.stringify(x)})'>View registration</button></article>`}).join('');
+ document.getElementById('cards').innerHTML=items.map((x,i)=>{let f=fee(+x.source),t=+x.source+f;return `<article class="card"><div class="plate">${esc(x.reg)}</div><div class="row"><div><div class="price">${money(t)}</div><div class="small">All-in example price</div></div><span class="tag">${esc(x.type)}</span></div><div class="breakdown"><div><span>Source price</span><b>${money(+x.source)}</b></div><div><span>Our service fee</span><b>${money(f)}</b></div><div><span>You pay</span><b>${money(t)}</b></div></div><button onclick="openReg(${i},'${encodeURIComponent(JSON.stringify(items))}')">View registration</button></article>`}).join('');
 }
-function doSearch(){let q=document.getElementById('search').value.trim().toUpperCase();let compact=q.replace(/\s/g,'');let hits=inventory.filter(x=>x.reg.replace(/\s/g,'').includes(compact)||[...compact].filter(c=>x.reg.includes(c)).length>=Math.min(3,compact.length));document.getElementById('resultTitle').textContent=q?`Matches for “${q}”`:"Registrations you might like";render(hits.length?hits:inventory)}
-function setSearch(v){document.getElementById('search').value=v;doSearch();document.getElementById('results').scrollIntoView({behavior:'smooth'})}
-function openReg(x){let f=fee(x.source),t=x.source+f;document.getElementById('modalBody').innerHTML=`<div class="eyebrow">${x.type} registration</div><div class="plate">${x.reg}</div><div class="total">${money(t)} total</div><p class="small">Demonstration listing — live availability must be verified before purchase.</p><div class="breakdown"><div><span>Registration/source price</span><b>${money(x.source)}</b></div><div><span>RegFinder sourcing & processing</span><b>${money(f)}</b></div><div><span>Total</span><b>${money(t)}</b></div></div><p class="notice"><b>Vehicle age:</b> ${x.year}. A personalised registration cannot be used to make a vehicle appear newer than it is.</p><button style="width:100%;margin-top:12px" onclick="alert('Checkout is intentionally disabled in this prototype until live inventory verification and payment fulfilment are connected.')">Continue to purchase</button>`;document.getElementById('modal').classList.add('on')}
-function closeModal(){document.getElementById('modal').classList.remove('on')}
-function lead(e){e.preventDefault();let leads=JSON.parse(localStorage.getItem('regfinder_leads')||'[]');leads.push({wanted:wanted.value,budget:budget.value,email:email.value,year:year.value,created:new Date().toISOString()});localStorage.setItem('regfinder_leads',JSON.stringify(leads));alert("Saved — your finder request has been recorded in this browser.");e.target.reset()}
+function doSearch(){let q=document.getElementById('search').value.trim().toUpperCase();let compact=q.replace(/\s/g,'');let hits=inventory.filter(x=>x.reg.replace(/\s/g,'').includes(compact)||(!compact?true:[...compact].filter(c=>x.reg.includes(c)).length>=Math.min(3,compact.length)));document.getElementById('resultTitle').textContent=q?`Matches for “${q}”`:"Registrations you might like";render(hits.length?hits:inventory)}
+function setSearch(v){search.value=v;doSearch();results.scrollIntoView({behavior:'smooth'})}
+function openReg(i,encoded){let arr=JSON.parse(decodeURIComponent(encoded)),x=arr[i],f=fee(+x.source),t=+x.source+f;modalBody.innerHTML=`<div class="eyebrow">${esc(x.type)} registration</div><div class="plate">${esc(x.reg)}</div><div class="total">${money(t)} total</div><p class="small">Availability and source price must be verified before acceptance.</p><div class="breakdown"><div><span>Registration/source price</span><b>${money(+x.source)}</b></div><div><span>RegFinder sourcing & processing</span><b>${money(f)}</b></div><div><span>Total</span><b>${money(t)}</b></div></div><p class="notice"><b>Vehicle age:</b> ${esc(x.year)}. A personalised registration cannot be used to make a vehicle appear newer than it is.</p><h3>Reserve / enquire</h3><div class="form"><input id="oName" placeholder="Your name"><input id="oEmail" type="email" placeholder="Email"><button onclick='reserve(${JSON.stringify(x)})'>Continue</button></div>`;modal.classList.add('on')}
+function closeModal(){modal.classList.remove('on')}
+function reserve(x){if(!oName.value||!oEmail.value)return alert('Enter your name and email.');let orders=JSON.parse(localStorage.getItem('regfinder_orders')||'[]');let f=fee(+x.source);orders.unshift({date:new Date().toISOString(),reg:x.reg,source:+x.source,fee:f,total:+x.source+f,name:oName.value,email:oEmail.value,status:'Awaiting verification'});localStorage.setItem('regfinder_orders',JSON.stringify(orders));closeModal();alert('Order enquiry saved. The registration must be verified before payment is taken.');refreshAdmin()}
+function lead(e){e.preventDefault();let leads=JSON.parse(localStorage.getItem('regfinder_leads')||'[]');leads.unshift({wanted:wanted.value,budget:budget.value,email:email.value,year:year.value,created:new Date().toISOString()});localStorage.setItem('regfinder_leads',JSON.stringify(leads));alert("Saved — your finder request has been recorded.");e.target.reset();refreshAdmin()}
+function openAdmin(){adminModal.classList.add('on');refreshAdmin();renderTiers()}
+function closeAdmin(){adminModal.classList.remove('on')}
+function tab(name,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');b.classList.add('active');refreshAdmin()}
+function refreshAdmin(){
+ let orders=JSON.parse(localStorage.getItem('regfinder_orders')||'[]'),leads=JSON.parse(localStorage.getItem('regfinder_leads')||'[]');
+ sInv.textContent=inventory.length;sOrders.textContent=orders.length;sLeads.textContent=leads.length;sFees.textContent=money(orders.reduce((a,o)=>a+(+o.fee||0),0));
+ inventoryRows.innerHTML=inventory.map((x,i)=>`<tr><td><b>${esc(x.reg)}</b></td><td>${money(+x.source)}</td><td>${money(fee(+x.source))}</td><td>${money(+x.source+fee(+x.source))}</td><td>${esc(x.type)}</td><td><button class="danger mini" onclick="delInv(${i})">Delete</button></td></tr>`).join('');
+ orderRows.innerHTML=orders.map(o=>`<tr><td>${new Date(o.date).toLocaleDateString('en-GB')}</td><td><b>${esc(o.reg)}</b></td><td>${money(+o.total)}</td><td>${esc(o.name)}</td><td>${esc(o.email)}</td><td>${esc(o.status)}</td></tr>`).join('');
+ leadRows.innerHTML=leads.map(l=>`<tr><td>${new Date(l.created).toLocaleDateString('en-GB')}</td><td><b>${esc(l.wanted)}</b></td><td>${esc(l.budget)}</td><td>${esc(l.email)}</td><td>${esc(l.year)}</td></tr>`).join('');
+}
+function addInventory(){let reg=aReg.value.trim().toUpperCase(),p=+aPrice.value;if(!reg||!p)return alert('Enter a registration and source price.');inventory.unshift({reg,source:p,type:aType.value,year:aYear.value||'Age rules apply',status:'Manual'});saveInv();aReg.value='';aPrice.value='';aYear.value=''}
+function delInv(i){if(confirm('Delete this registration?')){inventory.splice(i,1);saveInv()}}
+function saveInv(){localStorage.setItem('regfinder_inventory',JSON.stringify(inventory));render(inventory);refreshAdmin()}
+function renderTiers(){tierEditor.innerHTML=fees.map((x,i)=>`<div class="tierrow"><input type="number" id="max${i}" value="${x[0]>=999999999?'':x[0]}" placeholder="Maximum price (blank = unlimited)"><input type="number" id="fee${i}" value="${x[1]}" placeholder="Service fee"><span class="small" style="padding:11px">tier ${i+1}</span></div>`).join('')}
+function saveTiers(){let n=[];fees.forEach((x,i)=>{let max=document.getElementById('max'+i).value;n.push([max?+max:999999999,+document.getElementById('fee'+i).value])});n.sort((a,b)=>a[0]-b[0]);fees=n;localStorage.setItem('regfinder_fees',JSON.stringify(fees));render(inventory);refreshAdmin();alert('Pricing saved.')}
+function resetTiers(){fees=DEFAULT_FEES.map(x=>[...x]);localStorage.setItem('regfinder_fees',JSON.stringify(fees));renderTiers();render(inventory);refreshAdmin()}
+function csv(rows,name){if(!rows.length)return alert('Nothing to export.');let keys=Object.keys(rows[0]);let out=[keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportInventory(){csv(inventory,'regfinder-inventory.csv')}function exportOrders(){csv(JSON.parse(localStorage.getItem('regfinder_orders')||'[]'),'regfinder-orders.csv')}function exportLeads(){csv(JSON.parse(localStorage.getItem('regfinder_leads')||'[]'),'regfinder-leads.csv')}
 render(inventory);
 </script>
 </body></html>
